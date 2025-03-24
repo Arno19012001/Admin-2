@@ -13,4 +13,4 @@ $TTL 86400
 
 
 ns      IN      A       54.36.181.67
-www     IN      CNAME   ns
+www     IN      A	54.36.181.67
