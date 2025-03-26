@@ -16,6 +16,7 @@ services:
     volumes:
       #- ./db_data:/var/lib/mysql # persistance des données
       - ./mariadb/woodytoys.sql:/docker-entrypoint-initdb.d/woodytoys.sql
+      - ./mariadb/my-resolve.cnf:/etc/mysql/conf.d/my-resolve.cnf
     networks:
       - db_net
 
