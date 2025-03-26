@@ -1,0 +1,26 @@
+services:
+  web:
+    image: mon_web_docker-compose
+    container_name: web
+    ports:
+      - "80:80"
+    volumes:
+      - ./www:/var/www/html/www
+
+  mariadb:
+    image: mariadb:latest
+    container_name: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: mypass
+      MYSQL_DATABASE: woodytoys
+      MYSQL_USER: scoobodoo
+      MYSQL_PASSWORD: scoobodoo
+    volumes:
+      - ./db_data:/var/lib/mysql
+      - ./mariadb/woodytoys.sql:/docker-entrypoint-initdb.d/woodytoys.sql
+
+  php:
+    image: mon_php
+    container_name: php
+    volumes:
+      - ./www:/var/www/html/www
