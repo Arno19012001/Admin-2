@@ -1,3 +1,8 @@
 db_data/
 mariadb/*.env
 *.env
+web/certbot/conf/keys/
+web/certbot/conf/live/
+web/certbot/conf/accounts/
+web/certbot/conf/archive/
+web/certificate/nginx-selfsigned.key

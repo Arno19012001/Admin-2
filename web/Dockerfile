@@ -1,5 +1,9 @@
 FROM nginx:stable
 
-RUN rm /etc/nginx/nginx.conf
-COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
+RUN apt update && apt install -y certbot python3-certbot-nginx && rm -rf /var/lib/apt/lists/*
+
 RUN mkdir -p /var/www/html/www
+RUN mkdir -p /etc/ssl/certs
+RUN mkdir -p /etc/ssl/private
+RUN mkdir -p /etc/nginx/conf.d/
+RUN mkdir -p /etc/nginx/sites-enabled/
