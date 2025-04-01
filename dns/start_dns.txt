@@ -1,0 +1,6 @@
+La commande docker pour lancer le container dns : 
+docker run -d --name dns \
+  -p 53:53/tcp -p 53:53/udp \
+  -v ~/workflow/dns/m1-1.zone:/var/cache/bind/m1-1.zone \
+  -v ~/workflow/dns/named.conf:/etc/bind/named.conf \
+  mon_dns

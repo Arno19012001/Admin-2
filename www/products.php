@@ -40,5 +40,9 @@ while ($row = mysqli_fetch_array($result)) {
 ?>
 
 </table>
+<p>
+    Lien vers la page <a href="/">www</a><br>
+    Lien vers la page <a href="https://blog.m1-1.ephec-ti.be">blog</a>
+</p>
 </body>
 </html>
