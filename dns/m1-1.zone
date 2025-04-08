@@ -2,17 +2,21 @@ $ORIGIN m1-1.ephec-ti.be.
 $TTL 86400
 
 @       IN      SOA     ns.m1-1.ephec-ti.be.    hostmaster.ns.m1-1.ephec-ti.be. (
-                        2025040104   ; Numéro de série (format YYYYMMDDNN)
+                        2025040301   ; Numéro de série (format YYYYMMDDNN)
                         3600         ; Rafraîchissement (1 heure)
                         1800         ; Requête de mise à jour (30 minutes)
                         1209600      ; Expiration (2 semaines)
                         86400  )     ; Minimum TTL (1 jour)
 
 
-        IN      NS      ns.m1-1.ephec-ti.be.
+        IN      NS      ns
+	IN	MX 10	mail
 
 
 ns	IN      A       54.36.181.67
 www	IN      A	54.36.181.67
 blog	IN	CNAME	www
-shot	IN	CNAME	www
+mail	IN	A	54.36.181.67
+
+shot-n-go	IN	CNAME	www
+

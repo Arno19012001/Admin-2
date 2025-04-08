@@ -1,9 +1,6 @@
 services:
   web:
     image: mon_web
-    ports:
-      - "80:80"
-      - "443:443"
     volumes:
       - ./www:/var/www/html/www
       - ./web/nginx:/etc/nginx
@@ -13,6 +10,7 @@ services:
       - ./web/certificate/nginx-selfsigned.key:/etc/ssl/private/nginx-selfsigned.key
     networks:
       - dmz_net
+      - proxy_net
 
   mariadb:
     image: mariadb:11.1
@@ -39,6 +37,8 @@ services:
 networks:
   dmz_net:
   db_net:
+  proxy_net:
+    external: true
 
 volumes:
   mariadb_data:
