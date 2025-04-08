@@ -8,3 +8,4 @@ web/certbot/conf/archive/
 web/certificate/nginx-selfsigned.key
 web/certbot/log/
 mail/docker-data/
+tp_files/
