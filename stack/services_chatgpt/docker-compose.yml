@@ -1,0 +1,33 @@
+services:
+  db:
+    image: clemoudo/admin2:stack-database-latest
+    cap_add:
+      - SYS_NICE
+    restart: always
+    environment:
+      - MYSQL_DATABASE=woody
+      - MYSQL_ROOT_PASSWORD=pass
+    ports:
+      - '3306:3306'
+
+  api:
+    image: clemoudo/admin2:stack-api-latest
+    restart: always
+    links:
+      - "db"
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
+  front:
+    image: clemoudo/admin2:stack-front-latest
+
+  reverse:
+    image: clemoudo/admin2:stack-reverse_proxy-latest
+    ports:
+      - "80:8080"
+    depends_on:
+      - front
+      - api
