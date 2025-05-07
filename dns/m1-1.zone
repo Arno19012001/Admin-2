@@ -2,7 +2,7 @@ $ORIGIN m1-1.ephec-ti.be.
 $TTL 86400
 
 @       IN      SOA     ns.m1-1.ephec-ti.be.    hostmaster.ns.m1-1.ephec-ti.be. (
-                        2025041701   ; Numéro de série (format YYYYMMDDNN)
+                        2025050704   ; Numéro de série (format YYYYMMDDNN)
                         3600         ; Rafraîchissement (1 heure)
                         1800         ; Requête de mise à jour (30 minutes)
                         1209600      ; Expiration (2 semaines)
@@ -19,6 +19,9 @@ $TTL 86400
 ; dns
 ns		IN      A       54.36.181.67
 
+; proxy
+proxy		IN	A	54.36.181.67
+
 ; web
 www		IN      A	54.36.181.67
 blog		IN	CNAME	www
@@ -30,10 +33,13 @@ mail._domainkey IN      TXT     ( "v=DKIM1; h=sha256; k=rsa; "
           "9uRxU82h3ICBqGXg2m4Fr/A0iv9lOfF42cIj/JNDnhCOHRXhsBxwG7xBD9K6HSWDKr0YS7SrrrQnvRNG4FvDXcimLhcFQhXao8WNhYOUB11XQqmMD21TA9oQwXgedw/MOYbvCkWwIDAQAB" )  ; ----- DKIM key mail for m1-1.ephec-ti.be
 _dmarc		IN	TXT	"v=DMARC1; p=quarantine; rua=mailto:postmaster@m1-1.ephec-ti.be; ruf=mailto:postmaster@m1-1.ephec-ti.be; sp=reject; ri=86400"
 
-; docker swarm
-docker	150	IN	A	54.36.181.67	; vps-clement
-docker  150     IN      A	54.36.183.189	; vps-arno
-docker  150     IN      A	54.36.182.98	; vps-liam
+; docker (tp8-10)
+;docker	150	IN	A	54.36.181.67	; vps-clement
+docker	150     IN      A	54.36.183.189	; vps-arno
+;docker	150     IN      A	54.36.182.98	; vps-liam
+
+; cdn
+cdn.docker	IN	CNAME	cl-gld6ba9614.gcdn.co.	; cdn pour les sites reliés aux tp8-10
 
 
 ; --- dev ---

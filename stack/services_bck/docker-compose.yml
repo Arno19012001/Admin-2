@@ -24,7 +24,7 @@ services:
   reverse:
     build: ./reverse-proxy
     ports:
-      - "80:8080"
+      - "8080:8080"
     depends_on:
       - front
       - api

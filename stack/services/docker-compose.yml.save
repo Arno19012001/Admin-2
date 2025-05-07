@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   db:
     image: clemoudo/admin2:stack-database-latest
@@ -9,17 +11,23 @@ services:
       - MYSQL_ROOT_PASSWORD=pass
     ports:
       - '3306:3306'
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == vps-liam
+
 
   api:
     image: clemoudo/admin2:stack-api-latest
     restart: always
-    links:
-      - "db"
-
-  redis:
-    image: redis:alpine
-    ports:
-      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/misc/time"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    depends_on:
+      - db
 
   front:
     image: clemoudo/admin2:stack-front-latest

@@ -1,0 +1,17 @@
+services:
+  dns:
+    image: mon_dns
+    container_name: dns
+    ports:
+      - "53:53/udp"
+      - "53:53/tcp"
+    volumes:
+      - ./named.conf:/etc/bind/named.conf
+      - ./m1-1.zone:/var/cache/bind/m1-1.zone
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "dig +time=2 +tries=1 @127.0.0.1 ns.m1-1.ephec-ti.be | grep -q 'ANSWER:'"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
