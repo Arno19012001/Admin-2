@@ -1,0 +1,60 @@
+services:
+  web:
+    build: web/
+    image: mon_web
+    volumes:
+      - ./www:/var/www/html/www
+      - ./web/nginx:/etc/nginx
+    networks:
+      - dmz_net
+#      - proxy_net
+    ports:
+      - "80:80/tcp"
+      - "443:443/tcp"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  mariadb:
+    image: mariadb:11.1
+    env_file:
+      - mariadb/root.env
+      - mariadb/db.env
+    volumes:
+      - ./mariadb/woodytoys.sql:/docker-entrypoint-initdb.d/woodytoys.sql
+      - ./mariadb/my-resolve.cnf:/etc/mysql/conf.d/my-resolve.cnf
+      - mariadb_data:/var/lib/mysql
+    networks:
+      - db_net
+    restart: unless-stopped
+
+  php:
+    build: php/
+    image: mon_php
+    env_file:
+      - mariadb/db.env
+    volumes:
+      - ./www:/var/www/html/www
+    networks:
+      - dmz_net
+      - db_net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 9000"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+networks:
+  dmz_net:
+  db_net:
+  proxy_net:
+    external: true
+
+volumes:
+  mariadb_data:

@@ -1,0 +1,100 @@
+services:
+  web:
+    image: clemoudo/admin2:web-latest
+    networks:
+      - dmz_net
+    ports:
+      - "80:80/tcp"
+      - "443:443/tcp"
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == vps-arno
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    configs:
+      - source: nginx_config
+        target: /etc/nginx/nginx.conf
+    secrets:
+      - source: ssl_fullchain
+        target: fullchain.pem
+      - source: ssl_privkey
+        target: privkey.pem
+
+
+  mariadb:
+    image: clemoudo/admin2:mariadb-latest
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    networks:
+      - db_net
+    secrets:
+      - mariadb_root_password
+      - mariadb_user_password
+    environment:
+      MARIADB_HOST: mariadb
+      MARIADB_DATABASE: woodytoys
+      MARIADB_USER: wt-user
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == vps-clement
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+
+  php:
+    image: clemoudo/admin2:php-latest
+    secrets:
+      - mariadb_user_password
+    environment:
+      MARIADB_HOST: mariadb
+      MARIADB_DATABASE: woodytoys
+      MARIADB_USER: wt-user
+    networks:
+      - dmz_net
+      - db_net
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 9000"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == vps-liam
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+
+networks:
+  dmz_net:
+  db_net:
+
+volumes:
+  mariadb_data:
+
+configs:
+  nginx_config:
+    external: true
+
+secrets:
+  ssl_fullchain:
+    external: true
+  ssl_privkey:
+    external: true
+  mariadb_root_password:
+    external: true
+  mariadb_user_password:
+    external: true

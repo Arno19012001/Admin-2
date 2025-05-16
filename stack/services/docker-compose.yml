@@ -17,16 +17,16 @@ services:
         delay: 5s
         max_attempts: 3
     networks:
-      - tp9_backend
+      - db_net
 
   api:
     image: clemoudo/admin2:stack-api-latest
-#    healthcheck:
-#      test: ["CMD", "curl", "-f", "http://localhost:5000/api/misc/time"]
-#      interval: 30s
-#      timeout: 10s
-#      retries: 3
-#      start_period: 10s
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/misc/time"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
     depends_on:
       - db
     deploy:
@@ -38,7 +38,8 @@ services:
         constraints:
           - node.hostname == vps-clement
     networks:
-      - tp9_backend
+      - dmz_net
+      - db_net
 
   front:
     image: clemoudo/admin2:stack-front-latest
@@ -50,16 +51,19 @@ services:
       placement:
         constraints:
           - node.hostname == vps-arno
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
     networks:
-      - tp9_backend
+      - dmz_net
 
   reverse:
     image: clemoudo/admin2:stack-reverse_proxy-latest
     ports:
-      - target: 8080
-        published: 80
-        protocol: tcp
-        mode: host
+      - "8080:80/tcp"
     depends_on:
       - front
       - api
@@ -70,9 +74,9 @@ services:
         max_attempts: 3
       placement:
         constraints:
-          - node.hostname == vps-arno
+          - node.hostname == vps-clement
     networks:
-      - tp9_backend
+      - dmz_net
 
   redis:
     image: redis:7-alpine
@@ -86,8 +90,8 @@ services:
         constraints:
           - node.hostname == vps-clement
     networks:
-      - tp9_backend
+      - db_net
 
 networks:
-  tp9_backend:
-    external: true
+  dmz_net:
+  db_net:

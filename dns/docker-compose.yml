@@ -1,5 +1,6 @@
 services:
   dns:
+    build: .
     image: mon_dns
     container_name: dns
     ports:
