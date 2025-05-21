@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  db:
+    image: clemoudo/admin2:stack-database-latest
+    cap_add:
+      - SYS_NICE
+    restart: always
+    environment:
+      - MYSQL_DATABASE=woody
+      - MYSQL_ROOT_PASSWORD=pass
+    ports:
+      - '3306:3306'
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == vps-liam
+
+
+  api:
+    image: clemoudo/admin2:stack-api-latest
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/misc/time"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    depends_on:
+      - db
+
+  front:
+    image: clemoudo/admin2:stack-front-latest
+
+  reverse:
+    image: clemoudo/admin2:stack-reverse_proxy-latest
+    ports:
+      - "8080:8080"
+    depends_on:
+      - front
+      - api

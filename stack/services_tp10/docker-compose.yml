@@ -1,0 +1,100 @@
+version: "3.9"
+
+services:
+  db:
+    image: clemoudo/admin2:stack-database-latest
+    cap_add:
+      - SYS_NICE
+    environment:
+      - MYSQL_DATABASE=woody
+      - MYSQL_ROOT_PASSWORD=pass
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == vps-liam
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+    networks:
+      - db_net
+
+  api:
+    image: clemoudo/admin2:stack-api-latest
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/misc/time"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    depends_on:
+      - db
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      placement:
+        constraints:
+          - node.hostname == vps-clement
+    networks:
+      - dmz_net
+      - db_net
+
+  front:
+    image: clemoudo/admin2:stack-front-latest
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      placement:
+        constraints:
+          - node.hostname == vps-arno
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - dmz_net
+
+  reverse:
+    image: clemoudo/admin2:stack-reverse_proxy-latest
+    ports:
+      - target: 80
+        published: 80
+        protocol: tcp
+        mode: host
+    depends_on:
+      - front
+      - api
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      placement:
+        constraints:
+          - node.hostname == vps-arno
+    networks:
+      - dmz_net
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --save 60 1 --loglevel warning
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      placement:
+        constraints:
+          - node.hostname == vps-clement
+    networks:
+      - db_net
+
+networks:
+  dmz_net:
+  db_net:
