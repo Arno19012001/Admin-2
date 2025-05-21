@@ -4,9 +4,10 @@ from flask import Flask, request
 from flask_cors import CORS
 import redis  # Import Redis
 
-import app.woody as woody
+import woody
 
 app = Flask('my_api')
+app.url_map.strict_slashes = False
 cors = CORS(app)
 
 # Connexion à Redis
@@ -18,9 +19,10 @@ def ping():
     return 'ping'
 
 # ### 2. Product Service ###
-@app.route('/api/products', methods=['GET'])
+@app.route('/api/products', methods=['POST'])
 def add_product():
-    product = request.args.get('product')
+    data = request.form or request.get_json()  # supporte form + JSON
+    product = data.get('product')
     woody.add_product(str(product))
 
     # Invalidate cache
@@ -42,7 +44,7 @@ def get_last_product():
         return f'cached {datetime.now()} - {cached}'
 
     last_product = woody.get_last_product()  # very slow
-    redis_db.setex('last_product', 30, last_product)  # cache 30s
+    redis_db.setex('last_product', 600, last_product)  # cache 30s
 
     return f'db {datetime.now()} - {last_product}'
 

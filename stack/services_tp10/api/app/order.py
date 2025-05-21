@@ -4,9 +4,10 @@ from flask import Flask, request
 from flask_cors import CORS
 import redis  # Import Redis
 
-import app.woody as woody
+import woody
 
 app = Flask('my_api')
+app.url_map.strict_slashes = False
 cors = CORS(app)
 
 # Connexion à Redis
@@ -27,7 +28,7 @@ def create_order():
     return f"Your process {order_id} has been created with this product : {product}"
 
 
-@app.route('/api/orders/', methods=['GET'])
+@app.route('/api/orders', methods=['GET'])
 def get_order():
     order_id = request.args.get('order_id')
     status = woody.get_order(order_id)

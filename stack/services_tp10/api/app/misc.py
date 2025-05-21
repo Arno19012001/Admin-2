@@ -4,7 +4,7 @@ from flask import Flask, request
 from flask_cors import CORS
 import redis  # Import Redis
 
-import app.woody as woody
+import woody
 
 app = Flask('my_api')
 cors = CORS(app)
@@ -37,7 +37,7 @@ def get_heavy():
         return f'cached {datetime.now()}: {cached}'
 
     r = woody.make_some_heavy_computation(name)
-    redis_db.setex(cache_key, 60, r)  # expire after 60 seconds
+    redis_db.setex(cache_key, 600, r)  # expire after 60 seconds
     return f'computed {datetime.now()}: {r}'
 
 

@@ -76,7 +76,7 @@
         <tr>
             <td class="px-4 py-2 border-bottom">
                 <input type="text" id="product" name="product" placeholder="Product">
-                <button hx-get="/api/products"
+                <button hx-post="/api/products/"
                         hx-target="#data_product"
                         hx-include="[name='product']"
                         hx-indicator="#spinner_product"
@@ -126,7 +126,7 @@
         <tr>
             <td class="px-4 py-2 border-bottom">
                 <input type="text" id="order_id" name="order_id" placeholder="order id">
-                <button hx-get="api/orders"
+                <button hx-get="/api/orders/"
                         hx-include="[name='order_id']"
                         hx-target="#data_order_id"
                         class="bg-purple-500 text-white font-bold py-2 px-4 rounded">
