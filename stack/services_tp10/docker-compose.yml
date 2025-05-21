@@ -12,29 +12,73 @@ services:
     networks:
       - db_net
 
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: tp10_rabbitmq
+    ports:
+      - "5672:5672"  # Port AMQP pour les applications
+      - "15672:15672" # Port pour l'interface de management web
+    networks:
+      - db_net # Le worker et l'api order devront communiquer avec rabbitmq
+
   misc:
     build: api
     container_name: tp10_misc
     working_dir: /app
     command: python misc.py
+    environment:
+      RABBITMQ_HOST: rabbitmq # Même si misc ne l'utilise pas directement, c'est pour la cohérence
+    depends_on:
+      - db
+      - redis
+      - rabbitmq # Bonne pratique de lister toutes les dépendances de l'écosystème
     networks:
       - dmz_net
       - db_net
 
-  order:
+  order: # Ce service devient le producteur de messages
     build: api
-    container_name: tp10_order
+    container_name: tp10_order_api # Renommé pour clarté
     working_dir: /app
     command: python order.py
+    environment:
+      RABBITMQ_HOST: rabbitmq
+    depends_on:
+      - db
+      - redis
+      - rabbitmq
     networks:
       - dmz_net
       - db_net
+
+  order_worker: # Nouveau service consommateur
+    build: api # Réutilise le même build que les autres services python
+    container_name: tp10_order_worker
+    working_dir: /app
+    command: python order_worker.py # Nouveau script à créer
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      MYSQL_HOST: db # Assurez-vous que woody.py peut se connecter
+      MYSQL_USER: root
+      MYSQL_PASSWORD: pass
+      MYSQL_DATABASE: woody
+    depends_on:
+      - db
+      - rabbitmq
+    networks:
+      - db_net # Accès à RabbitMQ et à la DB
 
   product:
     build: api
     container_name: tp10_product
     working_dir: /app
     command: python product.py
+    environment:
+      RABBITMQ_HOST: rabbitmq
+    depends_on:
+      - db
+      - redis
+      - rabbitmq
     networks:
       - dmz_net
       - db_net
@@ -53,7 +97,7 @@ services:
     depends_on:
       - front
       - misc
-      - order
+      - order # Dépend de tp10_order_api
       - product
     networks:
       - dmz_net
